@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id                String    @id @default(uuid())
+  name              String    @unique
+  dateOfBirth       DateTime
+  fone              String
+  addressCep        String
+  addressRoad       String
+  addressNumber     String
+  addressComplement String
+  addressDistrict   String
+  addressCity       String
+  createdAt         DateTime
+  updatedAt         DateTime
+  Anamnese          Anamnese?
+  Paymant           Paymant[] @relation("client")
+  Service           Service[] @relation("client")
+
+  @@map("clients")
+}
+
+model Anamnese {
+  id             String   @id @default(uuid())
+  patient        Client   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  patientId      String   @unique
+  smoker         String
+  pregnant       String
+  headecha       String
+  insomnia       String
+  diabete        String
+  hypertension   String
+  stress         String
+  circulatory    String
+  allergy        String
+  anaemia        String
+  legPain        String
+  backPain       String
+  physical       String
+  physicalName   String
+  anotherDisease String
+  surgery        String
+  surgeryName    String
+  medicament     String
+  medicamentName String
+  reclamation    String
+  phrase         String
+  project        String
+  createdAt      DateTime
+  updatedAt      DateTime
+
+  @@map("anamnesis")
+}
+
+model Therapie {
+  id        String @id @default(uuid())
+  name      String
+  therapist String
+
+  @@map("therapies")
+}
+
+model Service {
+  id               String             @id @default(uuid())
+  createdAt        DateTime           @default(now())
+  patient          Client             @relation("client", fields: [patientId], references: [id], onDelete: Cascade)
+  patientId        String
+  TherapieServices TherapieServices[]
+  Paymant          Paymant?           @relation(fields: [paymantId], references: [id])
+  paymantId        String?
+
+  @@map("services")
+}
+
+model TherapieServices {
+  id        String  @id @default(uuid())
+  name      String
+  isConfirm Boolean
+  Service   Service @relation(fields: [serviceId], references: [id])
+  serviceId String
+
+  @@map("therapie_services")
+}
+
+model Paymant {
+  id              String    @id @default(uuid())
+  patient         Client    @relation("client", fields: [patientId], references: [id], onDelete: Cascade)
+  patientId       String
+  paymant         String
+  paymantConfirme String
+  observation     String
+  createdAt       DateTime
+  updatedAt       DateTime
+  Service         Service[]
+
+  @@map("paymant")
+}
